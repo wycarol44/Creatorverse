@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Navigate, useNavigate, useParams, useRoutes } from 'react-router-dom'
+import { supabase } from './client'
 import AddCreator from './pages/AddCreator'
 import EditCreator from './pages/EditCreator'
 import ShowCreators from './pages/ShowCreators'
@@ -12,36 +13,6 @@ const emptyCreator = {
   description: '',
   imageURL: '',
 }
-
-const initialCreators = [
-  {
-    id: 1,
-    name: 'Marques Brownlee',
-    url: 'https://www.youtube.com/@mkbhd',
-    description:
-      'Crisp, deeply researched videos about consumer tech, gadgets, and the future of personal devices.',
-    imageURL:
-      'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80',
-  },
-  {
-    id: 2,
-    name: 'Simone Giertz',
-    url: 'https://www.youtube.com/@simonegiertz',
-    description:
-      'Inventive builds, playful engineering projects, and thoughtful product experiments.',
-    imageURL:
-      'https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?auto=format&fit=crop&w=900&q=80',
-  },
-  {
-    id: 3,
-    name: 'Kurzgesagt',
-    url: 'https://www.youtube.com/@kurzgesagt',
-    description:
-      'Animated science explainers that make complex ideas clear, beautiful, and memorable.',
-    imageURL:
-      'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=900&q=80',
-  },
-]
 
 function AddCreatorRoute({ onAddCreator }) {
   const [formData, setFormData] = useState(emptyCreator)
@@ -72,7 +43,7 @@ function AddCreatorRoute({ onAddCreator }) {
 
 function ViewCreatorRoute({ creators, onDelete }) {
   const { id } = useParams()
-  const creator = creators.find((currentCreator) => currentCreator.id === Number(id))
+  const creator = creators.find((currentCreator) => String(currentCreator.id) === id)
 
   return <ViewCreator creator={creator} onDelete={onDelete} />
 }
@@ -82,7 +53,7 @@ function EditCreatorRoute({
   onUpdateCreator,
 }) {
   const { id } = useParams()
-  const creator = creators.find((currentCreator) => currentCreator.id === Number(id))
+  const creator = creators.find((currentCreator) => String(currentCreator.id) === id)
   const [formData, setFormData] = useState({
     name: creator?.name || '',
     url: creator?.url || '',
@@ -116,8 +87,26 @@ function EditCreatorRoute({
 }
 
 function App() {
-  const [creators, setCreators] = useState(initialCreators)
+  const [creators, setCreators] = useState([])
   const navigate = useNavigate()
+
+  useEffect(() => {
+    async function getCreators() {
+      const { data, error } = await supabase
+        .from('creators')
+        .select()
+        .order('id', { ascending: true })
+
+      if (error) {
+        console.error('Error fetching creators:', error.message)
+        return
+      }
+
+      setCreators(data || [])
+    }
+
+    getCreators()
+  }, [])
 
   const deleteCreator = (creatorId) => {
     setCreators((currentCreators) =>
@@ -139,7 +128,9 @@ function App() {
   const updateCreator = (creatorId, creatorData) => {
     setCreators((currentCreators) =>
       currentCreators.map((creator) =>
-        creator.id === Number(creatorId) ? { ...creator, ...creatorData } : creator,
+        String(creator.id) === String(creatorId)
+          ? { ...creator, ...creatorData }
+          : creator,
       ),
     )
   }

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Navigate, useNavigate, useParams, useRoutes } from 'react-router-dom'
 import AddCreator from './pages/AddCreator'
 import EditCreator from './pages/EditCreator'
 import ShowCreators from './pages/ShowCreators'
@@ -42,46 +43,9 @@ const initialCreators = [
   },
 ]
 
-function App() {
-  const [creators, setCreators] = useState(initialCreators)
-  const [page, setPage] = useState('show')
-  const [selectedCreator, setSelectedCreator] = useState(null)
+function AddCreatorRoute({ onAddCreator }) {
   const [formData, setFormData] = useState(emptyCreator)
-
-  const showCreators = () => {
-    setSelectedCreator(null)
-    setFormData(emptyCreator)
-    setPage('show')
-  }
-
-  const viewCreator = (creator) => {
-    setSelectedCreator(creator)
-    setPage('view')
-  }
-
-  const startAddCreator = () => {
-    setSelectedCreator(null)
-    setFormData(emptyCreator)
-    setPage('add')
-  }
-
-  const startEditCreator = (creator) => {
-    setSelectedCreator(creator)
-    setFormData({
-      name: creator.name,
-      url: creator.url,
-      description: creator.description,
-      imageURL: creator.imageURL || '',
-    })
-    setPage('edit')
-  }
-
-  const deleteCreator = (creatorId) => {
-    setCreators((currentCreators) =>
-      currentCreators.filter((creator) => creator.id !== creatorId),
-    )
-    showCreators()
-  }
+  const navigate = useNavigate()
 
   const handleInputChange = (event) => {
     const { name, value } = event.target
@@ -91,71 +55,124 @@ function App() {
     }))
   }
 
-  const addCreator = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault()
+    onAddCreator(formData)
+    navigate('/')
+  }
+
+  return (
+    <AddCreator
+      formData={formData}
+      onChange={handleInputChange}
+      onSubmit={handleSubmit}
+    />
+  )
+}
+
+function ViewCreatorRoute({ creators, onDelete }) {
+  const { id } = useParams()
+  const creator = creators.find((currentCreator) => currentCreator.id === Number(id))
+
+  return <ViewCreator creator={creator} onDelete={onDelete} />
+}
+
+function EditCreatorRoute({
+  creators,
+  onUpdateCreator,
+}) {
+  const { id } = useParams()
+  const creator = creators.find((currentCreator) => currentCreator.id === Number(id))
+  const [formData, setFormData] = useState({
+    name: creator?.name || '',
+    url: creator?.url || '',
+    description: creator?.description || '',
+    imageURL: creator?.imageURL || '',
+  })
+  const navigate = useNavigate()
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target
+    setFormData((currentData) => ({
+      ...currentData,
+      [name]: value,
+    }))
+  }
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    onUpdateCreator(id, formData)
+    navigate('/')
+  }
+
+  return (
+    <EditCreator
+      creator={creator}
+      formData={formData}
+      onChange={handleInputChange}
+      onSubmit={handleSubmit}
+    />
+  )
+}
+
+function App() {
+  const [creators, setCreators] = useState(initialCreators)
+  const navigate = useNavigate()
+
+  const deleteCreator = (creatorId) => {
+    setCreators((currentCreators) =>
+      currentCreators.filter((creator) => creator.id !== creatorId),
+    )
+    navigate('/')
+  }
+
+  const addCreator = (creatorData) => {
     setCreators((currentCreators) => [
       ...currentCreators,
       {
         id: Date.now(),
-        ...formData,
+        ...creatorData,
       },
     ])
-    showCreators()
   }
 
-  const updateCreator = (event) => {
-    event.preventDefault()
+  const updateCreator = (creatorId, creatorData) => {
     setCreators((currentCreators) =>
       currentCreators.map((creator) =>
-        creator.id === selectedCreator.id ? { ...creator, ...formData } : creator,
+        creator.id === Number(creatorId) ? { ...creator, ...creatorData } : creator,
       ),
     )
-    showCreators()
   }
 
-  if (page === 'add') {
-    return (
-      <AddCreator
-        formData={formData}
-        onChange={handleInputChange}
-        onSubmit={addCreator}
-        onCancel={showCreators}
-      />
-    )
-  }
+  const element = useRoutes([
+    {
+      path: '/',
+      element: <ShowCreators creators={creators} onDelete={deleteCreator} />,
+    },
+    {
+      path: '/new',
+      element: <AddCreatorRoute onAddCreator={addCreator} />,
+    },
+    {
+      path: '/view/:id',
+      element: <ViewCreatorRoute creators={creators} onDelete={deleteCreator} />,
+    },
+    {
+      path: '/edit/:id',
+      element: (
+        <EditCreatorRoute
+          creators={creators}
+          onUpdateCreator={updateCreator}
+        />
+      ),
+    },
+    {
+      path: '*',
+      element: <Navigate to="/" replace />,
+    },
+  ])
 
-  if (page === 'edit') {
-    return (
-      <EditCreator
-        creator={selectedCreator}
-        formData={formData}
-        onChange={handleInputChange}
-        onSubmit={updateCreator}
-        onCancel={showCreators}
-      />
-    )
-  }
-
-  if (page === 'view') {
-    return (
-      <ViewCreator
-        creator={selectedCreator}
-        onBack={showCreators}
-        onEdit={startEditCreator}
-        onDelete={deleteCreator}
-      />
-    )
-  }
-
-  return (
-    <ShowCreators
-      creators={creators}
-      onAdd={startAddCreator}
-      onView={viewCreator}
-      onEdit={startEditCreator}
-      onDelete={deleteCreator}
-    />
-  )
+  return <div className="app-container">{element}</div>
 }
 
 export default App

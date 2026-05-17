@@ -1,12 +1,14 @@
-function ViewCreator({ creator, onBack, onEdit, onDelete }) {
+import { Link } from 'react-router-dom'
+
+function ViewCreator({ creator, onDelete }) {
   if (!creator) {
     return (
       <main className="page">
         <section className="empty-state">
           <h1>Creator not found</h1>
-          <button type="button" onClick={onBack}>
+          <Link className="button-link" to="/">
             Back to creators
-          </button>
+          </Link>
         </section>
       </main>
     )
@@ -14,9 +16,9 @@ function ViewCreator({ creator, onBack, onEdit, onDelete }) {
 
   return (
     <main className="page detail-page">
-      <button className="text-button" type="button" onClick={onBack}>
+      <Link className="text-button button-link" to="/">
         Back to all creators
-      </button>
+      </Link>
 
       <section className="creator-detail">
         {creator.imageURL && (
@@ -33,9 +35,9 @@ function ViewCreator({ creator, onBack, onEdit, onDelete }) {
             <a href={creator.url} target="_blank" rel="noreferrer">
               Visit channel
             </a>
-            <button type="button" onClick={() => onEdit(creator)}>
+            <Link className="button-link" to={`/edit/${creator.id}`}>
               Edit creator
-            </button>
+            </Link>
             <button
               className="danger"
               type="button"

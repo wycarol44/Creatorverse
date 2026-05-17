@@ -119,8 +119,12 @@ a {
 }
 
 button,
+.button-link,
 .creator-card__actions a,
 .creator-detail__actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 42px;
   border: 1px solid transparent;
   border-radius: 6px;
@@ -132,6 +136,7 @@ button,
 }
 
 button:hover,
+.button-link:hover,
 .creator-card__actions a:hover,
 .creator-detail__actions a:hover {
   filter: brightness(0.95);

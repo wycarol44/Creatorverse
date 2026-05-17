@@ -1,4 +1,6 @@
-function Card({ creator, onView, onEdit, onDelete }) {
+import { Link } from 'react-router-dom'
+
+function Card({ creator, onDelete }) {
   const fallbackImage =
     'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=900&q=80'
 
@@ -19,12 +21,12 @@ function Card({ creator, onView, onEdit, onDelete }) {
           <a href={creator.url} target="_blank" rel="noreferrer">
             Visit
           </a>
-          <button type="button" onClick={() => onView(creator)}>
+          <Link to={`/view/${creator.id}`}>
             View
-          </button>
-          <button type="button" onClick={() => onEdit(creator)}>
+          </Link>
+          <Link to={`/edit/${creator.id}`}>
             Edit
-          </button>
+          </Link>
           <button
             className="danger"
             type="button"

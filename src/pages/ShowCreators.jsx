@@ -1,6 +1,7 @@
+import { Link } from 'react-router-dom'
 import Card from '../components/Card'
 
-function ShowCreators({ creators, onAdd, onView, onEdit, onDelete }) {
+function ShowCreators({ creators, onDelete }) {
   return (
     <main className="page">
       <header className="page-header">
@@ -8,9 +9,9 @@ function ShowCreators({ creators, onAdd, onView, onEdit, onDelete }) {
           <p className="eyebrow">Creatorverse</p>
           <h1>Content creators worth following</h1>
         </div>
-        <button type="button" onClick={onAdd}>
+        <Link className="button-link" to="/new">
           Add creator
-        </button>
+        </Link>
       </header>
 
       {creators.length > 0 ? (
@@ -19,8 +20,6 @@ function ShowCreators({ creators, onAdd, onView, onEdit, onDelete }) {
             <Card
               key={creator.id}
               creator={creator}
-              onView={onView}
-              onEdit={onEdit}
               onDelete={onDelete}
             />
           ))}
@@ -29,9 +28,9 @@ function ShowCreators({ creators, onAdd, onView, onEdit, onDelete }) {
         <section className="empty-state">
           <h2>No creators yet</h2>
           <p>Add your first favorite creator to start building the universe.</p>
-          <button type="button" onClick={onAdd}>
+          <Link className="button-link" to="/new">
             Add creator
-          </button>
+          </Link>
         </section>
       )}
     </main>

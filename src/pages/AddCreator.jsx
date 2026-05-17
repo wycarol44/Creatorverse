@@ -1,9 +1,11 @@
-function AddCreator({ formData, onChange, onSubmit, onCancel }) {
+import { Link } from 'react-router-dom'
+
+function AddCreator({ formData, onChange, onSubmit }) {
   return (
     <main className="page form-page">
-      <button className="text-button" type="button" onClick={onCancel}>
+      <Link className="text-button button-link" to="/">
         Back to all creators
-      </button>
+      </Link>
       <section>
         <h1>Add creator</h1>
         <CreatorForm

@@ -1,14 +1,15 @@
+import { Link } from 'react-router-dom'
 import { CreatorForm } from './AddCreator'
 
-function EditCreator({ creator, formData, onChange, onSubmit, onCancel }) {
+function EditCreator({ creator, formData, onChange, onSubmit }) {
   if (!creator) {
     return (
       <main className="page">
         <section className="empty-state">
           <h1>Creator not found</h1>
-          <button type="button" onClick={onCancel}>
+          <Link className="button-link" to="/">
             Back to creators
-          </button>
+          </Link>
         </section>
       </main>
     )
@@ -16,9 +17,9 @@ function EditCreator({ creator, formData, onChange, onSubmit, onCancel }) {
 
   return (
     <main className="page form-page">
-      <button className="text-button" type="button" onClick={onCancel}>
+      <Link className="text-button button-link" to="/">
         Back to all creators
-      </button>
+      </Link>
       <section>
         <h1>Edit {creator.name}</h1>
         <CreatorForm

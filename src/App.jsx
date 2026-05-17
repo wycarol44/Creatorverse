@@ -1,121 +1,160 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import AddCreator from './pages/AddCreator'
+import EditCreator from './pages/EditCreator'
+import ShowCreators from './pages/ShowCreators'
+import ViewCreator from './pages/ViewCreator'
 import './App.css'
 
+const emptyCreator = {
+  name: '',
+  url: '',
+  description: '',
+  imageURL: '',
+}
+
+const initialCreators = [
+  {
+    id: 1,
+    name: 'Marques Brownlee',
+    url: 'https://www.youtube.com/@mkbhd',
+    description:
+      'Crisp, deeply researched videos about consumer tech, gadgets, and the future of personal devices.',
+    imageURL:
+      'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80',
+  },
+  {
+    id: 2,
+    name: 'Simone Giertz',
+    url: 'https://www.youtube.com/@simonegiertz',
+    description:
+      'Inventive builds, playful engineering projects, and thoughtful product experiments.',
+    imageURL:
+      'https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?auto=format&fit=crop&w=900&q=80',
+  },
+  {
+    id: 3,
+    name: 'Kurzgesagt',
+    url: 'https://www.youtube.com/@kurzgesagt',
+    description:
+      'Animated science explainers that make complex ideas clear, beautiful, and memorable.',
+    imageURL:
+      'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=900&q=80',
+  },
+]
+
 function App() {
-  const [count, setCount] = useState(0)
+  const [creators, setCreators] = useState(initialCreators)
+  const [page, setPage] = useState('show')
+  const [selectedCreator, setSelectedCreator] = useState(null)
+  const [formData, setFormData] = useState(emptyCreator)
+
+  const showCreators = () => {
+    setSelectedCreator(null)
+    setFormData(emptyCreator)
+    setPage('show')
+  }
+
+  const viewCreator = (creator) => {
+    setSelectedCreator(creator)
+    setPage('view')
+  }
+
+  const startAddCreator = () => {
+    setSelectedCreator(null)
+    setFormData(emptyCreator)
+    setPage('add')
+  }
+
+  const startEditCreator = (creator) => {
+    setSelectedCreator(creator)
+    setFormData({
+      name: creator.name,
+      url: creator.url,
+      description: creator.description,
+      imageURL: creator.imageURL || '',
+    })
+    setPage('edit')
+  }
+
+  const deleteCreator = (creatorId) => {
+    setCreators((currentCreators) =>
+      currentCreators.filter((creator) => creator.id !== creatorId),
+    )
+    showCreators()
+  }
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target
+    setFormData((currentData) => ({
+      ...currentData,
+      [name]: value,
+    }))
+  }
+
+  const addCreator = (event) => {
+    event.preventDefault()
+    setCreators((currentCreators) => [
+      ...currentCreators,
+      {
+        id: Date.now(),
+        ...formData,
+      },
+    ])
+    showCreators()
+  }
+
+  const updateCreator = (event) => {
+    event.preventDefault()
+    setCreators((currentCreators) =>
+      currentCreators.map((creator) =>
+        creator.id === selectedCreator.id ? { ...creator, ...formData } : creator,
+      ),
+    )
+    showCreators()
+  }
+
+  if (page === 'add') {
+    return (
+      <AddCreator
+        formData={formData}
+        onChange={handleInputChange}
+        onSubmit={addCreator}
+        onCancel={showCreators}
+      />
+    )
+  }
+
+  if (page === 'edit') {
+    return (
+      <EditCreator
+        creator={selectedCreator}
+        formData={formData}
+        onChange={handleInputChange}
+        onSubmit={updateCreator}
+        onCancel={showCreators}
+      />
+    )
+  }
+
+  if (page === 'view') {
+    return (
+      <ViewCreator
+        creator={selectedCreator}
+        onBack={showCreators}
+        onEdit={startEditCreator}
+        onDelete={deleteCreator}
+      />
+    )
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <ShowCreators
+      creators={creators}
+      onAdd={startAddCreator}
+      onView={viewCreator}
+      onEdit={startEditCreator}
+      onDelete={deleteCreator}
+    />
   )
 }
 

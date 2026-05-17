@@ -1,49 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Navigate, useNavigate, useParams, useRoutes } from 'react-router-dom'
+import { Navigate, useNavigate, useRoutes } from 'react-router-dom'
 import { supabase } from './client'
 import AddCreator from './pages/AddCreator'
 import EditCreator from './pages/EditCreator'
 import ShowCreators from './pages/ShowCreators'
 import ViewCreator from './pages/ViewCreator'
 import './App.css'
-
-function EditCreatorRoute({
-  creators,
-  onUpdateCreator,
-}) {
-  const { id } = useParams()
-  const creator = creators.find((currentCreator) => String(currentCreator.id) === id)
-  const [formData, setFormData] = useState({
-    name: creator?.name || '',
-    url: creator?.url || '',
-    description: creator?.description || '',
-    imageURL: creator?.imageURL || '',
-  })
-  const navigate = useNavigate()
-
-  const handleInputChange = (event) => {
-    const { name, value } = event.target
-    setFormData((currentData) => ({
-      ...currentData,
-      [name]: value,
-    }))
-  }
-
-  const handleSubmit = (event) => {
-    event.preventDefault()
-    onUpdateCreator(id, formData)
-    navigate('/')
-  }
-
-  return (
-    <EditCreator
-      creator={creator}
-      formData={formData}
-      onChange={handleInputChange}
-      onSubmit={handleSubmit}
-    />
-  )
-}
 
 function App() {
   const [creators, setCreators] = useState([])
@@ -74,16 +36,6 @@ function App() {
     navigate('/')
   }
 
-  const updateCreator = (creatorId, creatorData) => {
-    setCreators((currentCreators) =>
-      currentCreators.map((creator) =>
-        String(creator.id) === String(creatorId)
-          ? { ...creator, ...creatorData }
-          : creator,
-      ),
-    )
-  }
-
   const element = useRoutes([
     {
       path: '/',
@@ -99,12 +51,7 @@ function App() {
     },
     {
       path: '/edit/:id',
-      element: (
-        <EditCreatorRoute
-          creators={creators}
-          onUpdateCreator={updateCreator}
-        />
-      ),
+      element: <EditCreator />,
     },
     {
       path: '*',

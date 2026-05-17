@@ -1,7 +1,88 @@
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { supabase } from '../client'
 import { CreatorForm } from './AddCreator'
 
-function EditCreator({ creator, formData, onChange, onSubmit }) {
+const emptyCreator = {
+  name: '',
+  url: '',
+  description: '',
+  imageURL: '',
+}
+
+function EditCreator() {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const [creator, setCreator] = useState(null)
+  const [formData, setFormData] = useState(emptyCreator)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    async function getCreator() {
+      const { data, error } = await supabase
+        .from('creators')
+        .select()
+        .eq('id', id)
+        .single()
+
+      if (error) {
+        console.error('Error fetching creator:', error.message)
+        setIsLoading(false)
+        return
+      }
+
+      setCreator(data)
+      setFormData({
+        name: data.name || '',
+        url: data.url || '',
+        description: data.description || '',
+        imageURL: data.imageURL || '',
+      })
+      setIsLoading(false)
+    }
+
+    getCreator()
+  }, [id])
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target
+    setFormData((currentData) => ({
+      ...currentData,
+      [name]: value,
+    }))
+  }
+
+  const updateCreator = async (event) => {
+    event.preventDefault()
+
+    const { error } = await supabase
+      .from('creators')
+      .update({
+        name: formData.name,
+        url: formData.url,
+        description: formData.description,
+        imageURL: formData.imageURL || null,
+      })
+      .eq('id', id)
+
+    if (error) {
+      console.error('Error updating creator:', error.message)
+      return
+    }
+
+    navigate('/')
+  }
+
+  if (isLoading) {
+    return (
+      <main className="page">
+        <section className="empty-state">
+          <h1>Loading creator...</h1>
+        </section>
+      </main>
+    )
+  }
+
   if (!creator) {
     return (
       <main className="page">
@@ -25,8 +106,8 @@ function EditCreator({ creator, formData, onChange, onSubmit }) {
         <CreatorForm
           formData={formData}
           submitLabel="Save changes"
-          onChange={onChange}
-          onSubmit={onSubmit}
+          onChange={handleInputChange}
+          onSubmit={updateCreator}
         />
       </section>
     </main>

@@ -73,6 +73,20 @@ function EditCreator() {
     navigate('/')
   }
 
+  const deleteCreator = async () => {
+    const { error } = await supabase
+      .from('creators')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      console.error('Error deleting creator:', error.message)
+      return
+    }
+
+    navigate('/')
+  }
+
   if (isLoading) {
     return (
       <main className="page">
@@ -109,6 +123,9 @@ function EditCreator() {
           onChange={handleInputChange}
           onSubmit={updateCreator}
         />
+        <button className="danger form-delete" type="button" onClick={deleteCreator}>
+          Delete creator
+        </button>
       </section>
     </main>
   )

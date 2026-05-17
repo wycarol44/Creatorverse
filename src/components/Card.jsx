@@ -14,6 +14,14 @@ function Card({ creator, onDelete }) {
       <div className="creator-card__content">
         <div>
           <h2>{creator.name}</h2>
+          <a
+            className="creator-card__url"
+            href={creator.url}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {creator.url}
+          </a>
           <p>{creator.description}</p>
         </div>
 

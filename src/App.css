@@ -52,6 +52,15 @@
   padding: 20px;
 }
 
+.creator-card__url {
+  display: block;
+  overflow-wrap: anywhere;
+  margin: 8px 0 12px;
+  color: var(--accent);
+  font-size: 15px;
+  line-height: 1.35;
+}
+
 .creator-card__actions,
 .creator-detail__actions {
   display: flex;

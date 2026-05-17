@@ -61,6 +61,11 @@
   line-height: 1.35;
 }
 
+.creator-detail__url {
+  overflow-wrap: anywhere;
+  color: var(--accent);
+}
+
 .creator-card__actions,
 .creator-detail__actions {
   display: flex;

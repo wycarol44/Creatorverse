@@ -41,13 +41,6 @@ function AddCreatorRoute({ onAddCreator }) {
   )
 }
 
-function ViewCreatorRoute({ creators, onDelete }) {
-  const { id } = useParams()
-  const creator = creators.find((currentCreator) => String(currentCreator.id) === id)
-
-  return <ViewCreator creator={creator} onDelete={onDelete} />
-}
-
 function EditCreatorRoute({
   creators,
   onUpdateCreator,
@@ -146,7 +139,7 @@ function App() {
     },
     {
       path: '/view/:id',
-      element: <ViewCreatorRoute creators={creators} onDelete={deleteCreator} />,
+      element: <ViewCreator onDelete={deleteCreator} />,
     },
     {
       path: '/edit/:id',

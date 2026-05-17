@@ -1,6 +1,44 @@
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { supabase } from '../client'
 
-function AddCreator({ formData, onChange, onSubmit }) {
+const emptyCreator = {
+  name: '',
+  url: '',
+  description: '',
+  imageURL: '',
+}
+
+function AddCreator() {
+  const [formData, setFormData] = useState(emptyCreator)
+  const navigate = useNavigate()
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target
+    setFormData((currentData) => ({
+      ...currentData,
+      [name]: value,
+    }))
+  }
+
+  const addCreator = async (event) => {
+    event.preventDefault()
+
+    const { error } = await supabase.from('creators').insert({
+      name: formData.name,
+      url: formData.url,
+      description: formData.description,
+      imageURL: formData.imageURL || null,
+    })
+
+    if (error) {
+      console.error('Error adding creator:', error.message)
+      return
+    }
+
+    navigate('/')
+  }
+
   return (
     <main className="page form-page">
       <Link className="text-button button-link" to="/">
@@ -11,8 +49,8 @@ function AddCreator({ formData, onChange, onSubmit }) {
         <CreatorForm
           formData={formData}
           submitLabel="Add creator"
-          onChange={onChange}
-          onSubmit={onSubmit}
+          onChange={handleInputChange}
+          onSubmit={addCreator}
         />
       </section>
     </main>

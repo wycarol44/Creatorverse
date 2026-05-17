@@ -7,40 +7,6 @@ import ShowCreators from './pages/ShowCreators'
 import ViewCreator from './pages/ViewCreator'
 import './App.css'
 
-const emptyCreator = {
-  name: '',
-  url: '',
-  description: '',
-  imageURL: '',
-}
-
-function AddCreatorRoute({ onAddCreator }) {
-  const [formData, setFormData] = useState(emptyCreator)
-  const navigate = useNavigate()
-
-  const handleInputChange = (event) => {
-    const { name, value } = event.target
-    setFormData((currentData) => ({
-      ...currentData,
-      [name]: value,
-    }))
-  }
-
-  const handleSubmit = (event) => {
-    event.preventDefault()
-    onAddCreator(formData)
-    navigate('/')
-  }
-
-  return (
-    <AddCreator
-      formData={formData}
-      onChange={handleInputChange}
-      onSubmit={handleSubmit}
-    />
-  )
-}
-
 function EditCreatorRoute({
   creators,
   onUpdateCreator,
@@ -108,16 +74,6 @@ function App() {
     navigate('/')
   }
 
-  const addCreator = (creatorData) => {
-    setCreators((currentCreators) => [
-      ...currentCreators,
-      {
-        id: Date.now(),
-        ...creatorData,
-      },
-    ])
-  }
-
   const updateCreator = (creatorId, creatorData) => {
     setCreators((currentCreators) =>
       currentCreators.map((creator) =>
@@ -135,7 +91,7 @@ function App() {
     },
     {
       path: '/new',
-      element: <AddCreatorRoute onAddCreator={addCreator} />,
+      element: <AddCreator />,
     },
     {
       path: '/view/:id',

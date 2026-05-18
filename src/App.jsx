@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Navigate, useNavigate, useRoutes } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate, useRoutes } from 'react-router-dom'
 import { supabase } from './client'
 import AddCreator from './pages/AddCreator'
 import EditCreator from './pages/EditCreator'
@@ -9,9 +9,14 @@ import './App.css'
 
 function App() {
   const [creators, setCreators] = useState([])
+  const location = useLocation()
   const navigate = useNavigate()
 
   useEffect(() => {
+    if (location.pathname !== '/') {
+      return
+    }
+
     async function getCreators() {
       const { data, error } = await supabase
         .from('creators')
@@ -27,11 +32,27 @@ function App() {
     }
 
     getCreators()
-  }, [])
+  }, [location.pathname])
 
-  const deleteCreator = (creatorId) => {
+  const deleteCreator = async (creatorId) => {
+    const { data, error } = await supabase
+      .from('creators')
+      .delete()
+      .eq('id', creatorId)
+      .select('id')
+
+    if (error) {
+      console.error('Error deleting creator:', error.message)
+      return
+    }
+
+    if (!data?.length) {
+      console.warn('No creator was deleted. Check the creator id or Supabase row policies.')
+      return
+    }
+
     setCreators((currentCreators) =>
-      currentCreators.filter((creator) => creator.id !== creatorId),
+      currentCreators.filter((creator) => String(creator.id) !== String(creatorId)),
     )
     navigate('/')
   }

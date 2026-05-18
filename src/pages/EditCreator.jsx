@@ -74,13 +74,19 @@ function EditCreator() {
   }
 
   const deleteCreator = async () => {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('creators')
       .delete()
       .eq('id', id)
+      .select('id')
 
     if (error) {
       console.error('Error deleting creator:', error.message)
+      return
+    }
+
+    if (!data?.length) {
+      console.warn('No creator was deleted. Check the creator id or Supabase row policies.')
       return
     }
 
